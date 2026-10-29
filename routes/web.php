@@ -7,7 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PeminjamanController;
 use Illuminate\Support\Facades\Route;
 
-// Guest Routes (Khusus yang belum login)
+// Guest Routes (Khusus pengguna belum login)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
@@ -15,15 +15,14 @@ Route::middleware('guest')->group(function () {
 
 // Authenticated Routes (Khusus Admin yang sudah login)
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
-    // TODO: - Daftarkan route resource untuk BukuController ('buku')
-    //      - Daftarkan route resource untuk AnggotaController ('anggota')
-    //      - Daftarkan route resource untuk PeminjamanController ('peminjaman')
-    //      - Daftarkan route PUT '/peminjaman/{peminjaman}/kembali' yang mengarah ke PeminjamanController method 'kembali'
+    // TODO 4: Daftarkan Route Resource Buku, Anggota, Peminjaman, dan Pengembalian
+    Route::resource('buku', BukuController::class);
+    Route::resource('anggota', AnggotaController::class)->parameters(['anggota' => 'anggota']);
+    Route::resource('peminjaman', PeminjamanController::class);
+    Route::put('/peminjaman/{peminjaman}/kembali', [PeminjamanController::class, 'kembali'])->name('peminjaman.kembali');
 });

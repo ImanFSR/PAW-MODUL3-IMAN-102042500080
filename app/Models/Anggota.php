@@ -13,7 +13,9 @@ class Anggota extends Model
 
     // TODO: Tentukan kolom tabel anggota yang dapat diisi melalui mass assignment ($fillable)
     protected $fillable = [
-        
+        'nama',
+        'email',
+        'no_hp',
     ];
 
     public function peminjaman()

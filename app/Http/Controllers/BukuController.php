@@ -30,9 +30,18 @@ class BukuController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO:- Lakukan validasi input: judul, penulis, penerbit, tahun_terbit, dan stok
-        //      - Simpan data buku ke database menggunakan Buku::create()
-        //      - Redirect ke halaman index buku dengan pesan sukses
+        // TODO 5: Validasi dan simpan data buku baru
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'penulis' => 'required|string|max:150',
+            'penerbit' => 'required|string|max:150',
+            'tahun_terbit' => 'required|digits:4|integer|min:1900|max:' . (date('Y') + 1),
+            'stok' => 'required|integer|min:0',
+        ]);
+
+        Buku::create($validated);
+
+        return redirect()->route('buku.index')->with('success', 'Buku berhasil ditambahkan.');
     }
 
     /**

@@ -30,9 +30,16 @@ class AnggotaController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO:- Lakukan validasi input: nama, email (harus format email & unik di tabel anggota), dan no_hp
-        //      -  Simpan data anggota ke database menggunakan Anggota::create()
-        //      - Redirect ke halaman index anggota dengan pesan sukses
+        // TODO 6: Validasi dan simpan data anggota baru
+        $validated = $request->validate([
+            'nama' => 'required|string|max:100',
+            'email' => 'required|email|max:100|unique:anggota,email',
+            'no_hp' => 'required|string|max:15',
+        ]);
+
+        Anggota::create($validated);
+
+        return redirect()->route('anggota.index')->with('success', 'Anggota berhasil ditambahkan.');
     }
 
     /**

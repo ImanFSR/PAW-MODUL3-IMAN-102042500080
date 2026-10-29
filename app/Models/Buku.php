@@ -13,7 +13,11 @@ class Buku extends Model
 
     // TODO: Tentukan kolom tabel buku yang dapat diisi melalui mass assignment ($fillable)
     protected $fillable = [
-        
+        'judul',
+        'penulis',
+        'penerbit',
+        'tahun_terbit',
+        'stok',        
     ];
 
     public function peminjaman()

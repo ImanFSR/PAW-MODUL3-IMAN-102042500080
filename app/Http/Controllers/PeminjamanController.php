@@ -39,12 +39,34 @@ class PeminjamanController extends Controller
      */
     public function store(Request $request)
     {
-        // TODO:- Lakukan validasi input: anggota_id, buku_id, dan tanggal_pinjam
-        //      - Simpan data transaksi ke database menggunakan Peminjaman::create() dengan status 'Dipinjam'
-        //      - Redirect ke halaman index peminjaman dengan pesan sukses
+        // TODO 7: Validasi transaksi, simpan transaksi, dan kurangi stok buku
+        $request->validate([
+            'anggota_id' => 'required|exists:anggota,id',
+            'buku_id' => 'required|exists:buku,id',
+            'tanggal_pinjam' => 'required|date',
+        ]);
+
+        $buku = Buku::findOrFail($request->buku_id);
+
+        if ($buku->stok < 1) {
+            return back()->withErrors(['buku_id' => 'Stok buku ini sedang habis.'])->withInput();
+        }
+
+        DB::transaction(function () use ($request, $buku) {
+            Peminjaman::create([
+                'anggota_id' => $request->anggota_id,
+                'buku_id' => $request->buku_id,
+                'tanggal_pinjam' => $request->tanggal_pinjam,
+                'status' => 'Dipinjam',
+            ]);
+
+            $buku->decrement('stok', 1);
+        });
+
+        return redirect()->route('peminjaman.index')->with('success', 'Transaksi peminjaman berhasil dicatat.');
     }
 
-    /**
+    /**Mengimplementasikan metode store() pada app/Http/Controllers/PeminjamanController.php untuk memvalidasi keberadaan anggota_id dan buku_id, memeriksa ketersediaan stok buku, serta mengeksekusi pencatatan riwayat peminjaman sekaligus mendepresiasi (mengurangi) nilai stok buku sebanyak 1 unit di dalam blok transaksi basis data DB::transaction().   
      * Menampilkan detail peminjaman buku.
      */
     public function show(Peminjaman $peminjaman)
